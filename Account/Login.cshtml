@@ -1,0 +1,109 @@
+﻿@{
+    ViewData["Title"] = "Sign In";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold">RaceDay</h2>
+                        <p class="text-muted">
+                            Sign in to continue your race journey.
+                        </p>
+                    </div>
+
+                    @if (ViewData.ModelState.ErrorCount > 0)
+                    {
+                        <div class="alert alert-danger">
+                            @Html.ValidationSummary(false)
+                        </div>
+                    }
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success">
+                            @TempData["SuccessMessage"]
+                        </div>
+                    }
+
+                    <form asp-controller="Account"
+                          asp-action="Login"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label for="Email"
+                                   class="form-label">Email address</label>
+                            <input type="email"
+                                   id="Email"
+                                   name="Email"
+                                   class="form-control form-control-lg"
+                                   placeholder="you@example.com"
+                                   autocomplete="email"
+                                   required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Password"
+                                   class="form-label">Password</label>
+
+                            <div class="input-group">
+                                <input type="password"
+                                       id="Password"
+                                       name="Password"
+                                       class="form-control form-control-lg"
+                                       placeholder="Enter your password"
+                                       autocomplete="current-password"
+                                       required />
+
+                                <button type="button"
+                                        class="btn btn-outline-secondary"
+                                        onclick="togglePassword()">
+                                    Show
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-lg w-100 mt-3">
+                            Sign In
+                        </button>
+                    </form>
+
+                    <p class="text-center mt-4 mb-0">
+                        Don't have an account?
+                        <a asp-controller="Account"
+                           asp-action="Register">
+                            Create an account
+                        </a>
+                    </p>
+
+                    <div class="text-center mt-3">
+                        <a asp-controller="Events"
+                           asp-action="Index"
+                           class="text-decoration-none">
+                            Explore events without signing in
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function togglePassword() {
+            const password = document.getElementById("Password");
+
+            password.type =
+                password.type === "password" ? "text" : "password";
+        }
+    </script>
+}
