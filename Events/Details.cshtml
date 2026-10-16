@@ -1,0 +1,98 @@
+﻿@model RaceDay222MVC.Models.EventViewModel
+
+@{
+    ViewData["Title"] = "Event Details";
+}
+
+<div class="container py-4">
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+        <div class="p-4 p-md-5 text-white"
+             style="background: linear-gradient(135deg, #172554, #2563eb);">
+
+            <span class="badge bg-warning text-dark mb-3">
+                RACEDAY EVENT
+            </span>
+
+            <h1 class="display-5 fw-bold">@Model.EventName</h1>
+
+            <p class="lead mb-0">
+                Explore the details of this race event.
+            </p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+                    <div class="border rounded-4 p-4 h-100">
+                        
+                        <h5 class="fw-bold">Event Date</h5>
+                        <p class="mb-0">
+                            @Model.EventDate.ToString("dddd, dd MMMM yyyy")
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="border rounded-4 p-4 h-100">
+                        <div class="fs-2 mb-2">📍</div>
+                        <h5 class="fw-bold">Location</h5>
+                        <p class="mb-0">
+                            @(string.IsNullOrWhiteSpace(Model.Location)
+                                ? "Location to be announced"
+                                : Model.Location)
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="border rounded-4 p-4">
+                        <h5 class="fw-bold">About This Event</h5>
+                        <p class="mb-0">
+                            @(string.IsNullOrWhiteSpace(Model.Description)
+                                ? "No description is available for this event yet."
+                                : Model.Description)
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-4">
+
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Back to Events
+                </a>
+
+                @if (Context.Session.GetString("JwtToken") == null)
+                {
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="btn btn-primary">
+                        Login to Participate
+                    </a>
+                }
+                else if (Context.Session.GetString("UserRole") == "Participant")
+                {
+                    <a asp-controller="Enrollments"
+                       asp-action="Index"
+                       class="btn btn-primary">
+                        Manage My Enrollments
+                    </a>
+                }
+
+                <a asp-controller="Results"
+                   asp-action="Index"
+                   class="btn btn-outline-primary">
+                    View Race Results
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+</div>

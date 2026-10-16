@@ -1,0 +1,220 @@
+﻿@model IEnumerable<RaceDay222MVC.Models.EventViewModel>
+
+@{
+ViewData["Title"] = "Browse Events";
+}
+
+<div class="container py-4">
+
+
+<!-- Page Header -->
+<div class="p-5 mb-5 rounded-4 text-white shadow"
+     style="background: tan);">
+
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <span class="badge bg-warning text-dark mb-3">
+                RACE DAY
+            </span>
+
+            <h1 class="display-5 fw-bold">
+                Discover Your Next Challenge
+            </h1>
+
+            <p class="lead mt-3">
+                Explore upcoming races, find events that match your interests,
+                and get ready to cross the finish line.
+            </p>
+
+            <a href="#events" class="btn btn-warning btn-lg mt-3 fw-semibold">
+                Browse All Events
+            </a>
+        </div>
+
+        <div class="col-lg-4 text-center mt-4 mt-lg-0">
+            <div class="display-1">race</div>
+            <h4 class="fw-bold">Your Race. Your Journey.</h4>
+        </div>
+    </div>
+</div>
+
+<!-- Notifications -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                aria-label="Close"></button>
+    </div>
+}
+
+<!-- Events Heading -->
+<div id="events" class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Available Events</h2>
+        <p class="text-muted mb-0">
+            Find a race and start planning your participation.
+        </p>
+    </div>
+
+    <span class="badge bg-primary fs-6 mt-2">
+        @(Model?.Count() ?? 0) Events
+    </span>
+</div>
+
+<!-- Event Cards -->
+@if (Model != null && Model.Any())
+{
+    <div class="row g-4">
+
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+
+                    <div class="p-4 text-white"
+                         style="background: linear-gradient(135deg, #1e3a8a, #3b82f6);">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-warning text-dark">
+                                Race Event
+                            </span>
+
+                            <span class="fs-2">race</span>
+                        </div>
+
+                        <h4 class="fw-bold mt-3 mb-0">
+                            @item.EventName
+                        </h4>
+                    </div>
+
+                    <div class="card-body p-4 d-flex flex-column">
+
+                        <p class="text-muted">
+                            @(string.IsNullOrWhiteSpace(item.Description)
+                                ? "Join this event and challenge yourself."
+                                : item.Description)
+                        </p>
+
+                        <div class="mb-3">
+                            <div class="fw-semibold mb-1"> Event Date</div>
+                            <div>
+                                @item.EventDate.ToString("dd MMMM yyyy")
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="fw-semibold mb-1"> Location</div>
+                            <div>
+                                @(string.IsNullOrWhiteSpace(item.Location)
+                                    ? "Location to be announced"
+                                    : item.Location)
+                            </div>
+                        </div>
+
+                        <div class="mt-auto">
+
+                            @if (Context.Session.GetString("JwtToken") != null &&
+                                 Context.Session.GetString("UserRole") == "Participant")
+                            {
+                                <a asp-controller="Enrollments"
+                                   asp-action="Index"
+                                   class="btn btn-primary w-100">
+                                    Manage My Enrollments
+                                </a>
+                            }
+                            else if (Context.Session.GetString("JwtToken") == null)
+                            {
+                                <a asp-controller="Account"
+                                   asp-action="Login"
+                                   class="btn btn-outline-primary w-100">
+                                    Login to Participate
+                                </a>
+                            }
+                            else
+                            {
+                                <button type="button"
+                                        class="btn btn-outline-secondary w-100"
+                                        disabled>
+                                    Participant Enrollment Only
+                                </button>
+                            }
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        }
+
+    </div>
+}
+else
+{
+    <div class="text-center bg-white border rounded-4 shadow-sm p-5">
+
+        <div class="display-3 mb-3">raceday</div>
+
+        <h3 class="fw-bold">No Events Available</h3>
+
+        <p class="text-muted mb-0">
+            There are currently no events to display. Please check back later.
+        </p>
+
+    </div>
+}
+
+<!-- Bottom Information -->
+<div class="row g-4 mt-4">
+
+    <div class="col-md-4">
+        <div class="bg-white border rounded-4 p-4 h-100">
+            <div class="fs-2 mb-2">find</div>
+            <h5 class="fw-bold">Explore Events</h5>
+            <p class="text-muted mb-0">
+                Review available events and their details before deciding to participate.
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="bg-white border rounded-4 p-4 h-100">
+            <div class="fs-2 mb-2">enrollment</div>
+            <h5 class="fw-bold">Manage Enrollment</h5>
+            <p class="text-muted mb-0">
+                Participants can access their enrollment information after signing in.
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="bg-white border rounded-4 p-4 h-100">
+            <div class="fs-2 mb-2">trophy</div>
+            <h5 class="fw-bold">Check Results</h5>
+            <p class="text-muted mb-0">
+                Visit the results page to see race results and finishing positions.
+            </p>
+
+            <a asp-controller="Results"
+               asp-action="Index"
+               class="btn btn-outline-primary btn-sm mt-3">
+                View Results
+            </a>
+        </div>
+    </div>
+
+</div>
+
+
+</div>
