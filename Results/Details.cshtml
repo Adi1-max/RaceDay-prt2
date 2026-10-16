@@ -1,0 +1,52 @@
+﻿@model RaceDay222MVC.Models.ResultsViewModel
+
+@{
+    ViewData["Title"] = "Result Details";
+}
+
+<div class="container py-4">
+    <div class="card border-0 shadow-sm rounded-4 mx-auto" style="max-width: 650px;">
+
+        <div class="card-header bg-dark text-white p-4">
+            <h2 class="fw-bold mb-0">Result Details</h2>
+        </div>
+
+        <div class="card-body p-4 text-center">
+
+            <div class="display-2 mb-3">
+                @(Model.Position == 1 ? "place" :
+                  Model.Position == 2 ? "place" :
+                  Model.Position == 3 ? "place" : "place")
+            </div>
+
+            <h3 class="fw-bold">
+                @(string.IsNullOrWhiteSpace(Model.ParticipantName)
+                    ? "Participant #" + Model.ParticipantID
+                    : Model.ParticipantName)
+            </h3>
+
+            <p class="text-muted">
+                @(string.IsNullOrWhiteSpace(Model.EventName)
+                    ? "Event #" + Model.EventID
+                    : Model.EventName)
+            </p>
+
+            <hr />
+
+            <p><strong>Result ID:</strong> @Model.ResultID</p>
+            <p><strong>Event ID:</strong> @Model.EventID</p>
+            <p><strong>Participant ID:</strong> @Model.ParticipantID</p>
+            <p><strong>Finishing Position:</strong> @Model.Position</p>
+            <p>
+                <strong>Completion Time:</strong>
+                @(string.IsNullOrWhiteSpace(Model.Time)
+                    ? "Not recorded"
+                    : Model.Time)
+            </p>
+
+            <a asp-action="Index" class="btn btn-primary mt-3">
+                Back to Results
+            </a>
+        </div>
+    </div>
+</div>

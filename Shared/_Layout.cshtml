@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+<title>@ViewData["Title"] - RaceDay222MVC</title>
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/RaceDay222MVC.styles.css" asp-append-version="true" />
+
+
+</head>
+
+<body class="bg-light">
+
+
+@{
+    var jwtToken = Context.Session.GetString("JwtToken");
+    var userRole = Context.Session.GetString("UserRole");
+    var isLoggedIn = !string.IsNullOrEmpty(jwtToken);
+    var isParticipant = userRole == "Participant";
+    var isOrganiser = userRole == "Organiser";
+}
+
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
+        <div class="container-fluid px-4">
+
+            <a class="navbar-brand fw-bold fs-4"
+               asp-controller="Home"
+               asp-action="Index">
+                 RaceDay
+            </a>
+
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#mainNavbar"
+                    aria-controls="mainNavbar"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+
+                <div class="navbar-nav me-auto gap-2 mt-3 mt-lg-0">
+
+                    <a class="btn btn-outline-light"
+                       asp-controller="Home"
+                       asp-action="Index">
+                        Home
+                    </a>
+
+                    <a class="btn btn-outline-light"
+                       asp-controller="Events"
+                       asp-action="Index">
+                        Discover Events
+                    </a>
+
+                    @if (isLoggedIn && isParticipant)
+                    {
+                        <a class="btn btn-outline-info"
+                           asp-controller="Enrollments"
+                           asp-action="Index">
+                            Manage Enrollment
+                        </a>
+                    }
+
+                    <a class="btn btn-outline-light"
+                       asp-controller="Results"
+                       asp-action="Index">
+                        View Results
+                    </a>
+
+                    @if (isLoggedIn && isOrganiser)
+                    {
+                        <a class="btn btn-outline-warning"
+                           asp-controller="OrganiserDashboard"
+                           asp-action="Index">
+                            Organiser Dashboard
+                        </a>
+
+                        <a class="btn btn-outline-warning"
+                           asp-controller="OrganiserEvents"
+                           asp-action="Index">
+                            Manage Events
+                        </a>
+                    }
+
+                    <a class="btn btn-outline-secondary"
+                       asp-controller="Home"
+                       asp-action="Privacy">
+                        Privacy
+                    </a>
+
+                </div>
+
+                <div class="navbar-nav ms-lg-3 mt-3 mt-lg-0">
+
+                    @if (isLoggedIn)
+                    {
+                        <span class="navbar-text text-white me-lg-3 mb-2 mb-lg-0">
+                            Signed In
+                        </span>
+
+                        <form asp-controller="Account"
+                              asp-action="Logout"
+                              method="post"
+                              class="d-inline">
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit" class="btn btn-danger">
+                                Logout
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-light me-lg-2 mb-2 mb-lg-0"
+                           asp-controller="Account"
+                           asp-action="Login">
+                            Login
+                        </a>
+
+                        <a class="btn btn-primary"
+                           asp-controller="Account"
+                           asp-action="Register">
+                            Register
+                        </a>
+                    }
+
+                </div>
+
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main role="main" class="container-fluid px-4 py-4">
+    @RenderBody()
+</main>
+
+<footer class="border-top bg-white text-muted mt-5 py-3">
+    <div class="container text-center">
+        &copy; 2026 - RaceDay222MVC -
+        <a asp-controller="Home"
+           asp-action="Privacy"
+           class="text-decoration-none">
+            Privacy
+        </a>
+    </div>
+</footer>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
+```
+
+</body>
+</html>
