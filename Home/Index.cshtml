@@ -1,0 +1,157 @@
+﻿@{
+ViewData["Title"] = "Home";
+}
+
+<section class="hero-section">
+    <div class="container py-5">
+        <span class="badge text-bg-light mb-3">
+            YOUR RACE. YOUR DAY.
+        </span>
+
+```
+    <h1 class="display-3 fw-bold">
+        Welcome to RaceDay
+    </h1>
+
+    <p class="lead mt-3">
+        Discover upcoming races, register for events,
+        and follow your racing journey in one place.
+    </p>
+
+    <div class="mt-4">
+        <a asp-controller="Events"
+           asp-action="Index"
+           class="btn btn-light btn-lg me-2 mb-2">
+            Explore Events
+        </a>
+
+        @if (Context.Session.GetString("JwtToken") != null)
+        {
+            <a asp-controller="Enrollments"
+               asp-action="Index"
+               class="btn btn-outline-light btn-lg me-2 mb-2">
+                My Enrolments
+            </a>
+
+            <a asp-controller="Results"
+               asp-action="Index"
+               class="btn btn-outline-light btn-lg mb-2">
+                View Results
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Account"
+               asp-action="Login"
+               class="btn btn-outline-light btn-lg me-2 mb-2">
+                Sign In
+            </a>
+
+            <a asp-controller="Account"
+               asp-action="Register"
+               class="btn btn-primary btn-lg mb-2">
+                Create Account
+            </a>
+        }
+    </div>
+</div>
+```
+
+</section>
+
+<section class="container py-5">
+    <h2 class="fw-bold mb-2">Everything you need for race day</h2>
+
+```
+<p class="text-muted mb-4">
+    Explore events, manage your participation, and follow race results.
+</p>
+
+<div class="row g-4">
+
+    <!-- Discover Events -->
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body p-4 d-flex flex-column">
+                <h3 class="h5 fw-bold">Discover Events</h3>
+
+                <p>
+                    Browse available races and find an event
+                    that suits you.
+                </p>
+
+                <a asp-controller="Events"
+                   asp-action="Index"
+                   class="btn btn-primary mt-auto">
+                    Browse Events
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Enrolments -->
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body p-4 d-flex flex-column">
+                <h3 class="h5 fw-bold">Manage Enrolments</h3>
+
+                <p>
+                    View your registered races and manage
+                    your participation.
+                </p>
+
+                @if (Context.Session.GetString("JwtToken") != null)
+                {
+                    <a asp-controller="Enrollments"
+                       asp-action="Index"
+                       class="btn btn-success mt-auto">
+                        Manage Enrolments
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="btn btn-outline-success mt-auto">
+                        Sign In to Continue
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- View Results -->
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body p-4 d-flex flex-column">
+                <h3 class="h5 fw-bold">View Results</h3>
+
+                <p>
+                    Check finishing positions and race performance
+                    when results become available.
+                </p>
+
+                @if (Context.Session.GetString("JwtToken") != null)
+                {
+                    <a asp-controller="Results"
+                       asp-action="Index"
+                       class="btn btn-dark mt-auto">
+                        View Results
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="btn btn-outline-dark mt-auto">
+                        Sign In to Continue
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+```
+
+</section>
