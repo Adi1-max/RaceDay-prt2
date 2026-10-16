@@ -1,0 +1,115 @@
+﻿@model IEnumerable<RaceDay222MVC.Models.ParticipantViewModel>
+
+@{
+ViewData["Title"] = "Participants";
+}
+
+<div class="container py-4">
+
+```
+<div class="p-4 p-md-5 mb-4 rounded-4 text-white shadow"
+     style="background: linear-gradient(135deg, #172554, #2563eb);">
+
+    <h1 class="display-6 fw-bold">Participant Management</h1>
+
+    <p class="lead mb-3">
+        View and manage registered RaceDay participants.
+    </p>
+
+    <a asp-action="Create" class="btn btn-warning fw-semibold">
+        + Add Participant
+    </a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-white py-3">
+        <h4 class="mb-0 fw-bold">Registered Participants</h4>
+    </div>
+
+    <div class="card-body">
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var participant in Model)
+                        {
+                            <tr>
+                                <td>@participant.ParticipantID</td>
+                                <td class="fw-semibold">@participant.FullName</td>
+                                <td>@participant.Email</td>
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(participant.PhoneNumber)
+                                        ? "Not provided"
+                                        : participant.PhoneNumber)
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="Details"
+                                       asp-route-id="@participant.ParticipantID"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Details
+                                    </a>
+
+                                    <form asp-action="Delete"
+                                          asp-route-id="@participant.ParticipantID"
+                                          method="post"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Delete this participant?');">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <div class="display-4 mb-3">👥</div>
+                <h4>No participants found</h4>
+                <p class="text-muted">
+                    Participant records will appear here when available.
+                </p>
+            </div>
+        }
+
+    </div>
+</div>
+
+<a asp-controller="Home"
+   asp-action="Index"
+   class="btn btn-outline-secondary mt-4">
+    Back to Home
+</a>
+```
+
+</div>

@@ -1,0 +1,103 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@{
+    ViewData["Title"] = "Participant Dashboard";
+    var userName = Context.Session.GetString("UserName") ?? "Participant";
+}
+
+<div class="container py-5">
+
+    <!-- Welcome Section -->
+    <div class="p-5 mb-5 rounded-4 bg-dark text-white shadow">
+        <h1 class="display-5 fw-bold">
+            Welcome back, @userName!
+        </h1>
+
+        <p class="lead mt-3">
+            Ready for your next challenge? Discover races, manage your
+            enrollments, and track your results in one place.
+        </p>
+
+        <a asp-controller="Events"
+           asp-action="Index"
+           class="btn btn-primary btn-lg mt-3">
+            Discover Events
+        </a>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <h2 class="fw-bold mb-4">Your Dashboard</h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4">
+                <div class="card-body p-4">
+                    <div class="fs-1 mb-3">🏁</div>
+
+                    <h4 class="fw-bold">Discover Events</h4>
+
+                    <p class="text-muted">
+                        Explore upcoming races and find an event
+                        that matches your interests.
+                    </p>
+
+                    <a asp-controller="Events"
+                       asp-action="Index"
+                       class="btn btn-primary w-100">
+                        Browse Events
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4">
+                <div class="card-body p-4">
+                    <div class="fs-1 mb-3">📋</div>
+
+                    <h4 class="fw-bold">My Enrollments</h4>
+
+                    <p class="text-muted">
+                        View your registered events and manage
+                        your enrollments.
+                    </p>
+
+                    <a asp-controller="Enrollments"
+                       asp-action="Index"
+                       class="btn btn-outline-primary w-100">
+                        Manage Enrollments
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4">
+                <div class="card-body p-4">
+                    <div class="fs-1 mb-3">trophies</div>
+
+                    <h4 class="fw-bold">Race Results</h4>
+
+                    <p class="text-muted">
+                        Check available race results and see
+                        your performance.
+                    </p>
+
+                    <a asp-controller="Results"
+                       asp-action="Index"
+                       class="btn btn-outline-primary w-100">
+                        View Results
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="alert alert-info mt-5 rounded-3">
+        <strong>RaceDay Tip:</strong>
+        Check upcoming events regularly so you don't miss registration.
+    </div>
+
+</div>

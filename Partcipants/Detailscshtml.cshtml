@@ -1,0 +1,33 @@
+﻿@model RaceDay222MVC.Models.ParticipantViewModel
+
+@{
+    ViewData["Title"] = "Participant Details";
+}
+
+<div class="container py-4">
+    <div class="card border-0 shadow-sm rounded-4 mx-auto" style="max-width: 650px;">
+        <div class="card-header bg-dark text-white p-4">
+            <h2 class="fw-bold mb-0">Participant Details</h2>
+        </div>
+
+        <div class="card-body p-4">
+            <h3 class="fw-bold">@Model.FullName</h3>
+            <hr />
+
+            <p><strong>Participant ID:</strong> @Model.ParticipantID</p>
+            <p><strong>First Name:</strong> @Model.FirstName</p>
+            <p><strong>Last Name:</strong> @Model.LastName</p>
+            <p><strong>Email:</strong> @Model.Email</p>
+            <p>
+                <strong>Phone:</strong>
+                @(string.IsNullOrWhiteSpace(Model.PhoneNumber)
+                    ? "Not provided"
+                    : Model.PhoneNumber)
+            </p>
+
+            <a asp-action="Index" class="btn btn-primary mt-3">
+                Back to Participants
+            </a>
+        </div>
+    </div>
+</div>
