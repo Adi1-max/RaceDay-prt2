@@ -1,0 +1,126 @@
+﻿@model IEnumerable<RaceDay222MVC.Models.PaymentViewModel>
+
+@{
+    ViewData["Title"] = "Payments";
+}
+
+<div class="container py-4">
+
+    <div class="p-4 p-md-5 mb-4 rounded-4 text-white shadow"
+         style="background: linear-gradient(135deg, #172554, #2563eb);">
+
+        <h1 class="display-6 fw-bold">Payment Management</h1>
+
+        <p class="lead mb-0">
+            Review payment requests and payment statuses.
+        </p>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-white p-3">
+            <h4 class="fw-bold mb-0">Payment Records</h4>
+        </div>
+
+        <div class="card-body">
+
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Enrollment ID</th>
+                                <th>Amount</th>
+                                <th>Payment Date</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var payment in Model)
+                            {
+                                <tr>
+                                    <td>@payment.PaymentID</td>
+                                    <td>@payment.EnrollmentID</td>
+                                    <td>@payment.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-ZA"))</td>
+                                    <td>
+                                        @(payment.PaymentDate.HasValue
+                                            ? payment.PaymentDate.Value.ToString("dd MMM yyyy")
+                                            : "Pending")
+                                    </td>
+                                    <td>
+                                        @(string.IsNullOrWhiteSpace(payment.PaymentMethod)
+                                            ? "Not specified"
+                                            : payment.PaymentMethod)
+                                    </td>
+                                    <td>
+                                        @if (payment.Status == "Completed" ||
+                                             payment.Status == "Paid" ||
+                                             payment.Status == "Successful")
+                                        {
+                                            <span class="badge bg-success">
+                                                @payment.Status
+                                            </span>
+                                        }
+                                        else if (payment.Status == "Failed")
+                                        {
+                                            <span class="badge bg-danger">
+                                                @payment.Status
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                @(string.IsNullOrWhiteSpace(payment.Status)
+                                                    ? "Pending"
+                                                    : payment.Status)
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a asp-action="Details"
+                                           asp-route-id="@payment.PaymentID"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <div class="display-3 mb-3">💳</div>
+                    <h4>No payment records found</h4>
+                    <p class="text-muted">
+                        Payment records will appear here when available.
+                    </p>
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <a asp-controller="Home"
+       asp-action="Index"
+       class="btn btn-outline-secondary mt-4">
+        Back to Home
+    </a>
+
+</div>

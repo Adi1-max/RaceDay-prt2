@@ -1,196 +1,143 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using RaceDay222.DatabaseContext;
-using RaceDay222.DatabaseContext;
+﻿using Microsoft.AspNetCore.Mvc;
+using RaceDay222MVC.Models;
+using RaceDay222MVC.Services;
 
-namespace RaceDay222.Controllers
+namespace RaceDay222MVC.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize]
-    public class PaymentsController : ControllerBase
+    public class PaymentsController : Controller
     {
-        private readonly RaceDayContext _context;
+        private readonly PaymentApiService _paymentService;
 
-        public PaymentsController(IConfiguration configuration)
+        public PaymentsController(PaymentApiService paymentService)
         {
-            _context = new RaceDayContext(configuration);
+            _paymentService = paymentService;
         }
 
-        // GET: api/Payments
-        // Organisers can view all payments.
+        private string? GetToken()
+        {
+            return HttpContext.Session.GetString("JwtToken");
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var token = GetToken();
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            try
+            {
+                var payments =
+                    await _paymentService
+                        .GetAllAsync<PaymentViewModel>(token);
+
+                return View(payments);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["Error"] =
+                    "Unable to retrieve payment records.";
+
+                return View(new List<PaymentViewModel>());
+            }
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var token = GetToken();
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var payment =
+                    await _paymentService
+                        .GetByIdAsync<PaymentViewModel>(id, token);
+
+                if (payment == null)
+                {
+                    return NotFound();
+                }
+
+                return View(payment);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["Error"] =
+                    "Unable to retrieve the payment.";
+
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
         [HttpGet]
-        [Authorize(Roles = "Organiser")]
-        public async Task<IActionResult> GetAllPayments()
+        public IActionResult Create()
         {
-            var payments = new List<object>();
-
-            using var connection = _context.GetConnection();
-            await connection.OpenAsync();
-
-            string sql = @"
-                SELECT
-                    p.PaymentID,
-                    p.EnrollmentID,
-                    e.ParticipantID,
-                    e.EventID,
-                    p.Amount,
-                    p.PaymentDate,
-                    p.Status
-                FROM Payment p
-                INNER JOIN Enrollment e
-                    ON p.EnrollmentID = e.EnrollmentID
-                ORDER BY p.PaymentDate DESC";
-
-            using var command = new SqlCommand(sql, connection);
-            using var reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
+            if (string.IsNullOrEmpty(GetToken()))
             {
-                payments.Add(new
-                {
-                    PaymentID = reader["PaymentID"],
-                    EnrollmentID = reader["EnrollmentID"],
-                    ParticipantID = reader["ParticipantID"],
-                    EventID = reader["EventID"],
-                    Amount = reader["Amount"],
-                    PaymentDate = reader["PaymentDate"],
-                    Status = reader["Status"]
-                });
+                return RedirectToAction("Login", "Account");
             }
 
-            return Ok(payments);
+            return View(new PaymentCreateViewModel());
         }
 
-        // GET: api/Payments/my-payments
-        // Participants can view their own payments.
-        [HttpGet("my-payments")]
-        [Authorize(Roles = "Participant")]
-        public async Task<IActionResult> GetMyPayments()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(
+            PaymentCreateViewModel model)
         {
-            if (!int.TryParse(
-                User.FindFirstValue(ClaimTypes.NameIdentifier),
-                out int participantId))
+            var token = GetToken();
+
+            if (string.IsNullOrEmpty(token))
             {
-                return Unauthorized("Invalid participant identity.");
+                return RedirectToAction("Login", "Account");
             }
 
-            var payments = new List<object>();
-
-            using var connection = _context.GetConnection();
-            await connection.OpenAsync();
-
-            string sql = @"
-                SELECT
-                    p.PaymentID,
-                    p.EnrollmentID,
-                    e.EventID,
-                    ev.EventName,
-                    p.Amount,
-                    p.PaymentDate,
-                    p.Status
-                FROM Payment p
-                INNER JOIN Enrollment e
-                    ON p.EnrollmentID = e.EnrollmentID
-                INNER JOIN [Event] ev
-                    ON e.EventID = ev.EventID
-                WHERE e.ParticipantID = @ParticipantID
-                ORDER BY p.PaymentDate DESC";
-
-            using var command = new SqlCommand(sql, connection);
-
-            command.Parameters.AddWithValue(
-                "@ParticipantID", participantId);
-
-            using var reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
+            if (!ModelState.IsValid)
             {
-                payments.Add(new
+                return View(model);
+            }
+
+            try
+            {
+                var payment =
+                    await _paymentService
+                        .CreateAsync<
+                            PaymentCreateViewModel,
+                            PaymentViewModel>(model, token);
+
+                if (payment == null)
                 {
-                    PaymentID = reader["PaymentID"],
-                    EnrollmentID = reader["EnrollmentID"],
-                    EventID = reader["EventID"],
-                    EventName = reader["EventName"],
-                    Amount = reader["Amount"],
-                    PaymentDate = reader["PaymentDate"],
-                    Status = reader["Status"]
-                });
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "The API did not return a payment record.");
+
+                    return View(model);
+                }
+
+                TempData["Success"] =
+                    "Payment request submitted successfully.";
+
+                return RedirectToAction(nameof(Index));
             }
-
-            return Ok(payments);
-        }
-
-        // GET: api/Payments/5
-        // Participants can view a payment belonging to them.
-        // Organisers can view any payment.
-        [HttpGet("{id:int}")]
-        [Authorize(Roles = "Participant,Organiser")]
-        public async Task<IActionResult> GetPayment(int id)
-        {
-            bool isOrganiser = User.IsInRole("Organiser");
-
-            if (!int.TryParse(
-                User.FindFirstValue(ClaimTypes.NameIdentifier),
-                out int currentUserId))
+            catch (HttpRequestException)
             {
-                return Unauthorized("Invalid user identity.");
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Unable to submit the payment request.");
+
+                return View(model);
             }
-
-            using var connection = _context.GetConnection();
-            await connection.OpenAsync();
-
-            string sql = @"
-                SELECT
-                    p.PaymentID,
-                    p.EnrollmentID,
-                    e.ParticipantID,
-                    e.EventID,
-                    ev.EventName,
-                    p.Amount,
-                    p.PaymentDate,
-                    p.Status
-                FROM Payment p
-                INNER JOIN Enrollment e
-                    ON p.EnrollmentID = e.EnrollmentID
-                INNER JOIN [Event] ev
-                    ON e.EventID = ev.EventID
-                WHERE p.PaymentID = @PaymentID";
-
-            using var command = new SqlCommand(sql, connection);
-
-            command.Parameters.AddWithValue("@PaymentID", id);
-
-            using var reader = await command.ExecuteReaderAsync();
-
-            if (!await reader.ReadAsync())
-            {
-                return NotFound("Payment not found.");
-            }
-
-            int paymentParticipantId =
-                Convert.ToInt32(reader["ParticipantID"]);
-
-            if (!isOrganiser && paymentParticipantId != currentUserId)
-            {
-                return Forbid();
-            }
-
-            var payment = new
-            {
-                PaymentID = reader["PaymentID"],
-                EnrollmentID = reader["EnrollmentID"],
-                ParticipantID = reader["ParticipantID"],
-                EventID = reader["EventID"],
-                EventName = reader["EventName"],
-                Amount = reader["Amount"],
-                PaymentDate = reader["PaymentDate"],
-                Status = reader["Status"]
-            };
-
-            return Ok(payment);
         }
     }
 }

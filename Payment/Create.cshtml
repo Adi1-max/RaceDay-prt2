@@ -1,0 +1,103 @@
+﻿@model RaceDay222MVC.Models.PaymentCreateViewModel
+
+@{
+    ViewData["Title"] = "Submit Payment Request";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            <div class="card border-0 shadow rounded-4">
+
+                <div class="card-header text-white p-4"
+                     style="background: linear-gradient(135deg, #172554, #2563eb);">
+
+                    <h2 class="fw-bold mb-1">Payment Request</h2>
+
+                    <p class="mb-0">
+                        Submit the details required for your payment request.
+                    </p>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <div class="alert alert-info">
+                        Submitting this form creates a payment request.
+                        It does not confirm that money has been received.
+                    </div>
+
+                    <form asp-action="Create" method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="EnrollmentID"
+                                   class="form-label fw-semibold"></label>
+
+                            <input asp-for="EnrollmentID"
+                                   class="form-control"
+                                   type="number"
+                                   min="1" />
+
+                            <span asp-validation-for="EnrollmentID"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Amount"
+                                   class="form-label fw-semibold"></label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">R</span>
+
+                                <input asp-for="Amount"
+                                       class="form-control"
+                                       type="number"
+                                       min="0.01"
+                                       step="0.01" />
+                            </div>
+
+                            <span asp-validation-for="Amount"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="PaymentMethod"
+                                   class="form-label fw-semibold"></label>
+
+                            <select asp-for="PaymentMethod" class="form-select">
+                                <option value="">Select a payment method</option>
+                                <option value="Card">Card</option>
+                                <option value="EFT">EFT</option>
+                                <option value="Other">Other</option>
+                            </select>
+
+                            <span asp-validation-for="PaymentMethod"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Submit Payment Request
+                        </button>
+
+                        <a asp-action="Index"
+                           class="btn btn-outline-secondary ms-2">
+                            Cancel
+                        </a>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
